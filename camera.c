@@ -15,12 +15,13 @@
 #include <libavutil/imgutils.h>
 
 #include "camera.h"
-#include "record.h"
+#include "buzzer.h"
+#include "led.h"
 
 static char *devName;
 static int fd = -1; // camera file
 
-int frameNum = 0; // stores the number of frameNum the camera has seen so far
+int frames = 0; // stores the number of frames the camera has seen so far
 
 struct buffer
 {
@@ -175,15 +176,10 @@ static void startCapturing()
 
 uint8_t *prevFrameData = NULL;
 
-int motion = 0;
-int prevMotion = -1;
-int firstFrame = 1;
-
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 static void processImage(unsigned char *p, int size)
 {
   fwrite(p, size, 1, stdout);
-  Record_addFrame(p, size);
 
   // Create MJPEG codec
   AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
@@ -200,8 +196,7 @@ static void processImage(unsigned char *p, int size)
   // Take the mjpeg buffer data and put it in packet
   AVPacket packet;
   av_init_packet(&packet);
-  packet.data = malloc(sizeof(unsigned char) * size);
-  memcpy(packet.data, p, size);
+  packet.data = p;
   packet.size = size;
 
   // Send packet to avcodec to it can decode with the provided codec
@@ -252,33 +247,16 @@ static void processImage(unsigned char *p, int size)
     // if more than 10% of pixels are different then motion!
     if (differentPixels >= frameDataSize * 0.1)
     {
-      motion++;
+        fprintf(stderr, "MOTION!\n");
+        Buzzer_init();
+        led_init();
     }
     else
     {
-      motion--;
-      if (motion < 0)
-      {
-        motion = 0;
-      }
+      // printf("no motion.\n");
+      led_cleanup();
+      Buzzer_cleanup();
     }
-
-    if (firstFrame != 0)
-    {
-      if (motion == 1 && prevMotion < 1)
-      { // motion has begun
-        Record_markStart();
-      }
-
-      if (prevMotion > 0 && motion == 0)
-      {
-        Record_markEnd();
-      }
-    }
-
-    fprintf(stderr, "\n------------------------\nFrame: %d\nMotion:%d\n--------------------\n", frameNum, motion);
-    prevMotion = motion;
-    firstFrame = 1;
   }
 
   // set current frame as prevFrame, so it can be prevFrame for the next frame.
@@ -288,7 +266,7 @@ static void processImage(unsigned char *p, int size)
   avcodec_free_context(&codecContext);
   av_frame_free(&frame);
 
-  frameNum++; // increment the count of frameNum dealt with.
+  frames++; // increment the count of frames dealt with.
 
   fflush(stderr);
   fprintf(stderr, ".");
@@ -346,7 +324,7 @@ static void closeDevice(void)
 }
 
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
-void Camera_beginCamera()
+void beginCamera()
 {
   devName = "/dev/video0";
   openDevice();
