@@ -10,5 +10,6 @@ To use:
 
 1. run `make` on target
 2. Then on target `make run` or `./motionProject | ffmpeg -vcodec mjpeg -i pipe:0 -f mjpeg udp://192.168.7.1:1234` in the `~/project` folder.
+
 3. Then on host open VLC and then in Media->open Network Stream->Network->Network Protocol->"Please enter a
    network URL" field enter: "udp://@:1234"
