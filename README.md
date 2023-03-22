@@ -1,4 +1,4 @@
-# cameraHelloWorld
+# motion project
 
 This repo is there to simply get the camera working and to learn how to interact with it.
 
