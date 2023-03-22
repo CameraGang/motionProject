@@ -1,0 +1,14 @@
+OUTFILE = cameraTest
+OUTDIR = $(HOME)/project
+
+CROSS_COMPILE = arm-linux-gnueabihf-
+CC_C = gcc
+CFLAGS = -Wall -g -std=c99 -D_POSIX_C_SOURCE=200809L -Wshadow -pthread
+FILES =  main.c
+LIBS = $(shell pkg-config --cflags libavformat libavcodec libswresample libswscale libavutil)
+
+all:
+	$(CC_C) $(CFLAGS) $(FILES)  -o $(OUTDIR)/$(OUTFILE) -lavformat -lavcodec -lavutil -lswscale
+
+clean:
+	rm $(OUTDIR)/$(OUTFILE)
