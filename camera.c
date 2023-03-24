@@ -15,11 +15,12 @@
 #include <libavutil/imgutils.h>
 
 #include "camera.h"
+#include "recordBuffer.h"
 
 static char *devName;
 static int fd = -1; // camera file
 
-int frames = 0; // stores the number of frames the camera has seen so far
+int frameNum = 0; // stores the number of frameNum the camera has seen so far
 
 struct buffer
 {
@@ -174,10 +175,15 @@ static void startCapturing()
 
 uint8_t *prevFrameData = NULL;
 
+int motion = 0;
+int prevMotion = -1;
+int firstFrame = 1;
+
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 static void processImage(unsigned char *p, int size)
 {
   fwrite(p, size, 1, stdout);
+  RecordBuffer_recordFrame(p, size);
 
   // Create MJPEG codec
   AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
@@ -245,12 +251,34 @@ static void processImage(unsigned char *p, int size)
     // if more than 10% of pixels are different then motion!
     if (differentPixels >= frameDataSize * 0.1)
     {
-      fprintf(stderr, "MOTION!\n");
+      motion++;
     }
     else
     {
+      motion--;
+      if (motion < 0)
+      {
+        motion = 0;
+      }
       // printf("no motion.\n");
     }
+
+    if (firstFrame != 0)
+    {
+      if (motion >= 5 && prevMotion < 5)
+      { // motion has begun
+        RecordBuffer_noteMotionStart();
+      }
+
+      if (prevMotion > 0 && motion == 0)
+      {
+        RecordBuffer_noteMotionEnd();
+      }
+    }
+
+    fprintf(stderr, "\n------------------------\nFrame: %d\nMotion:%d\n--------------------\n", frameNum, motion);
+    prevMotion = motion;
+    firstFrame = 1;
   }
 
   // set current frame as prevFrame, so it can be prevFrame for the next frame.
@@ -260,7 +288,7 @@ static void processImage(unsigned char *p, int size)
   avcodec_free_context(&codecContext);
   av_frame_free(&frame);
 
-  frames++; // increment the count of frames dealt with.
+  frameNum++; // increment the count of frameNum dealt with.
 
   fflush(stderr);
   fprintf(stderr, ".");
