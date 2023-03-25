@@ -15,7 +15,7 @@
 #include <libavutil/imgutils.h>
 
 #include "camera.h"
-#include "recordBuffer.h"
+#include "record.h"
 
 static char *devName;
 static int fd = -1; // camera file
@@ -183,7 +183,7 @@ int firstFrame = 1;
 static void processImage(unsigned char *p, int size)
 {
   fwrite(p, size, 1, stdout);
-  RecordBuffer_recordFrame(p, size);
+  Record_addFrame(p, size);
 
   // Create MJPEG codec
   AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
@@ -200,7 +200,8 @@ static void processImage(unsigned char *p, int size)
   // Take the mjpeg buffer data and put it in packet
   AVPacket packet;
   av_init_packet(&packet);
-  packet.data = p;
+  packet.data = malloc(sizeof(unsigned char) * size);
+  memcpy(packet.data, p, size);
   packet.size = size;
 
   // Send packet to avcodec to it can decode with the provided codec
@@ -260,19 +261,18 @@ static void processImage(unsigned char *p, int size)
       {
         motion = 0;
       }
-      // printf("no motion.\n");
     }
 
     if (firstFrame != 0)
     {
-      if (motion >= 5 && prevMotion < 5)
+      if (motion == 1 && prevMotion < 1)
       { // motion has begun
-        RecordBuffer_noteMotionStart();
+        Record_markStart();
       }
 
       if (prevMotion > 0 && motion == 0)
       {
-        RecordBuffer_noteMotionEnd();
+        Record_markEnd();
       }
     }
 
@@ -346,7 +346,7 @@ static void closeDevice(void)
 }
 
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
-void beginCamera()
+void Camera_beginCamera()
 {
   devName = "/dev/video0";
   openDevice();

@@ -5,6 +5,6 @@
 #define HEIGHT 720
 #define THRESHOLD 30
 
-void beginCamera();
+void Camera_beginCamera();
 
 #endif
