@@ -1,7 +1,9 @@
 #include "camera.h"
+#include "record.h"
+#include <unistd.h>
 
 int main()
 {
-  beginCamera();
+  Camera_beginCamera();
   return 0;
 }
