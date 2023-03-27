@@ -13,3 +13,17 @@ To use:
 
 3. Then on host open VLC and then in Media->open Network Stream->Network->Network Protocol->"Please enter a
    network URL" field enter: "udp://@:1234"
+
+### Mounting the USB in order to save the video file:
+
+1. Connect the USB drive to the BeagleBone board.
+
+2. Log in to the BeagleBone board and run the command `lsblk` to see the list of disks and their mount points.
+
+3. Identify the USB drive from the output of the `lsblk` command. It should have a name like /dev/sda1 or /dev/sdb1.
+
+4. Create a directory to use as the mount point for the USB drive. For example, you can create a directory named /mnt/usb by running the command `sudo mkdir /mnt/usb`.
+
+5. Mount the USB drive to the directory you just created by running the command `sudo mount /dev/sda1 /mnt/usb` (replace /dev/sda1 with the name of the USB drive you identified in step 3).
+
+6. Verify that the USB drive is mounted correctly by running the command `df -h` . You should see a line in the output showing the mount point directory /mnt/usb and the device name of the USB drive.
