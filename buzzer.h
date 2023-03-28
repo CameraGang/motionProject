@@ -14,17 +14,17 @@
 #define DA_JOYSTICK_FILE_NAME_HERE_R "/sys/class/gpio/gpio47/value"
 #define DA_JOYSTICK_FILE_NAME_HERE_I "/sys/class/gpio/gpio27/value"
 
-pthread_t buzzerThreadId;
+
 
 
 enum direction {
 		UP, DOWN, LEFT, RIGHT, NODIR, IN
 };
 
-void runCommandSing(char* command);
+// void runCommandSing(char* command);
 
 
-void initCommands(void);
+void initCommandsBuzzer(void);
 
 
 void startBuzzerA(int mode);
@@ -39,7 +39,7 @@ void stopBuzzer(void);
 enum direction joystickDir(void);
 
 
-int readFromFileToScreen(char *fileName);
+int readFromFileToScreenBuzz(char *fileName);
 
 
 // void sleepForMs(long long delayInMs);
@@ -53,3 +53,4 @@ void Buzzer_cleanup();
 
 void *buzzerThread(void *arg);
 	
+void play();

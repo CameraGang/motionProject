@@ -1,5 +1,8 @@
 #include "led.h"
 #include "helper.h"
+#include "sharedFunc.h"
+
+pthread_t ledThreadId;
 
 // long long getTimeInMs(void)
 // {
@@ -23,31 +26,31 @@
 // 	nanosleep(&reqDelay, (struct timespec *) NULL);
 // }
 
-void runCommandSing(char* command){
-    // Execute the shell command (output into pipe)
-    FILE *pipe = popen(command, "r");
-    // Ignore output of the command; but consume it
-    // so we don't get an error when closing the pipe.
-    char buffer[1024];
-    while (!feof(pipe) && !ferror(pipe)) {
-        if (fgets(buffer, sizeof(buffer), pipe) == NULL)
-            break;
-        // printf("--> %s", buffer); // Uncomment for debugging
-    }
-    // Get the exit code from the pipe; non-zero is an error:
-    int exitCode = WEXITSTATUS(pclose(pipe));
-    if (exitCode != 0) {
-        perror("Unable to execute command:");
-        printf(" command: %s\n", command);
-        printf(" exit code: %d\n", exitCode);
-    }
-}
+// void runCommandSing(char* command){
+//     // Execute the shell command (output into pipe)
+//     FILE *pipe = popen(command, "r");
+//     // Ignore output of the command; but consume it
+//     // so we don't get an error when closing the pipe.
+//     char buffer[1024];
+//     while (!feof(pipe) && !ferror(pipe)) {
+//         if (fgets(buffer, sizeof(buffer), pipe) == NULL)
+//             break;
+//         // printf("--> %s", buffer); // Uncomment for debugging
+//     }
+//     // Get the exit code from the pipe; non-zero is an error:
+//     int exitCode = WEXITSTATUS(pclose(pipe));
+//     if (exitCode != 0) {
+//         perror("Unable to execute command:");
+//         printf(" command: %s\n", command);
+//         printf(" exit code: %d\n", exitCode);
+//     }
+// }
 
 
 //LIKELY NEEDS CHANGING
-void initCommands(void){
+void initCommandsLed(void){
 
-    runCommandSing("config-pin p9.23 gpio");
+    // runCommandSing("sudo config-pin p9.23 gpio");
 
 	//setting the gpio to inport
 	FILE *pFileA = fopen("/sys/class/gpio/gpio49/direction", "w");
@@ -100,7 +103,7 @@ void stopLed(){
 	fclose(pFileA);
 }
 
-int readFromFileToScreen(char *fileName)
+int readFromFileToScreenLed(char *fileName)
 {
 	FILE *pFile = fopen(fileName, "r");
 	if (pFile == NULL) {
@@ -117,7 +120,7 @@ int readFromFileToScreen(char *fileName)
 }
 
 void led_init(){
-	   initCommands(); 
+	initCommandsLed(); 
     pthread_create(&ledThreadId, NULL, &ledThread, NULL);
 }
 
@@ -134,3 +137,4 @@ void *ledThread(void *arg){
 	startLed();
 	return 0;
 }
+

@@ -1,5 +1,6 @@
 #include "buzzer.h"
 #include "helper.h"
+#include "sharedFunc.h"
 
 // void sleepForMs(long long delayInMs)
 // {
@@ -12,40 +13,31 @@
 // 	nanosleep(&reqDelay, (struct timespec *) NULL);
 // }
 
-
-long long getTimeInMs(void)
-{
-	struct timespec spec;
-	clock_gettime(CLOCK_REALTIME, &spec);
-	long long seconds = spec.tv_sec;
-	long long nanoSeconds = spec.tv_nsec;
-	long long milliSeconds = seconds * 1000 + nanoSeconds / 1000000;
-	return milliSeconds;
-}
+pthread_t buzzerThreadId;
 
 enum direction joystickDir(void){
 	
 
-	int U = readFromFileToScreen(DA_JOYSTICK_FILE_NAME_HERE_U);	
+	int U = readFromFileToScreenBuzz(DA_JOYSTICK_FILE_NAME_HERE_U);	
 	if(U == 0){
 		return UP;
 	}
 
-	int D = readFromFileToScreen(DA_JOYSTICK_FILE_NAME_HERE_D);	
+	int D = readFromFileToScreenBuzz(DA_JOYSTICK_FILE_NAME_HERE_D);	
 	if(D == 0){
 		return DOWN;
 	}
 
-	int L = readFromFileToScreen(DA_JOYSTICK_FILE_NAME_HERE_L);	
+	int L = readFromFileToScreenBuzz(DA_JOYSTICK_FILE_NAME_HERE_L);	
 	if(L == 0){
 		return LEFT;
 	}
 
-	int R = readFromFileToScreen(DA_JOYSTICK_FILE_NAME_HERE_R);	
+	int R = readFromFileToScreenBuzz(DA_JOYSTICK_FILE_NAME_HERE_R);	
 	if(R == 0){
 		return RIGHT;
 	}
-    int I = readFromFileToScreen(DA_JOYSTICK_FILE_NAME_HERE_I);	
+    int I = readFromFileToScreenBuzz(DA_JOYSTICK_FILE_NAME_HERE_I);	
 	if(I == 0){
 		return IN;
 	}
@@ -55,28 +47,28 @@ enum direction joystickDir(void){
 }
 
 
-void runCommandSing(char* command){
-    // Execute the shell command (output into pipe)
-    FILE *pipe = popen(command, "r");
-    // Ignore output of the command; but consume it
-    // so we don't get an error when closing the pipe.
-    char buffer[1024];
-    while (!feof(pipe) && !ferror(pipe)) {
-        if (fgets(buffer, sizeof(buffer), pipe) == NULL)
-            break;
-        // printf("--> %s", buffer); // Uncomment for debugging
-    }
-    // Get the exit code from the pipe; non-zero is an error:
-    int exitCode = WEXITSTATUS(pclose(pipe));
-    if (exitCode != 0) {
-        perror("Unable to execute command:");
-        printf(" command: %s\n", command);
-        printf(" exit code: %d\n", exitCode);
-    }
-}
+// void runCommandSing(char* command){
+//     // Execute the shell command (output into pipe)
+//     FILE *pipe = popen(command, "r");
+//     // Ignore output of the command; but consume it
+//     // so we don't get an error when closing the pipe.
+//     char buffer[1024];
+//     while (!feof(pipe) && !ferror(pipe)) {
+//         if (fgets(buffer, sizeof(buffer), pipe) == NULL)
+//             break;
+//         // printf("--> %s", buffer); // Uncomment for debugging
+//     }
+//     // Get the exit code from the pipe; non-zero is an error:
+//     int exitCode = WEXITSTATUS(pclose(pipe));
+//     if (exitCode != 0) {
+//         perror("Unable to execute command:");
+//         printf(" command: %s\n", command);
+//         printf(" exit code: %d\n", exitCode);
+//     }
+// }
 
 
-void initCommands(void){
+void initCommandsBuzzer(void){
     runCommandSing("sudo config-pin p9_22 pwm");
 
 
@@ -338,7 +330,7 @@ int modeSetter(int currMode){
     return currMode;
 }
 
-int readFromFileToScreen(char *fileName)
+int readFromFileToScreenBuzz(char *fileName)
 {
 	FILE *pFile = fopen(fileName, "r");
 	if (pFile == NULL) {
@@ -356,8 +348,9 @@ int readFromFileToScreen(char *fileName)
 
 void Buzzer_init()
 {
-    initCommands();
+    initCommandsBuzzer();
     pthread_create(&buzzerThreadId, NULL, &buzzerThread, NULL);
+    
 }
 
 void Buzzer_cleanup()
@@ -370,7 +363,7 @@ void *buzzerThread(void *arg){
 // int main(){
 
     //remove later
-    initCommands();
+    // initCommandsBuzzer();
 
     int WLT = 1;
 
@@ -475,8 +468,8 @@ void *buzzerThread(void *arg){
             }
             else if(dirIn == UP){
                 if(currTime - prevTime >= 500){
-                    printf("%d\n",sleepOff);
-                    printf("%d\n",sleepOn);
+                    // printf("%d\n",sleepOff);
+                    // printf("%d\n",sleepOn);
                     sleepOff -= 5;
                     sleepOn -= 5;
                     prevTime = currTime;
@@ -484,8 +477,8 @@ void *buzzerThread(void *arg){
             }
             else if(dirIn == DOWN){
                 if(currTime - prevTime >= 500){
-                    printf("%d\n",sleepOff);
-                    printf("%d\n",sleepOn);
+                    // printf("%d\n",sleepOff);
+                    // printf("%d\n",sleepOn);
                     sleepOff += 5;
                     sleepOn += 5;
                     prevTime = currTime;
