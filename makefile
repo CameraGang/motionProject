@@ -4,7 +4,7 @@ OUTDIR = $(HOME)/project
 CROSS_COMPILE = arm-linux-gnueabihf-
 CC_C = gcc
 CFLAGS = -Wall -g -std=c99 -D_POSIX_C_SOURCE=200809L -Wshadow -pthread
-FILES =  main.c camera.c record.c helper.c 
+FILES =  main.c camera.c record.c helper.c frameToServer.c
 LIBS = $(shell pkg-config --cflags libavformat libavcodec libswresample libswscale libavutil)
 
 all:

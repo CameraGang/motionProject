@@ -16,6 +16,7 @@
 
 #include "camera.h"
 #include "record.h"
+#include "frameToServer.h"
 
 static char *devName;
 static int fd = -1; // camera file
@@ -182,7 +183,10 @@ int firstFrame = 1;
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 static void processImage(unsigned char *p, int size)
 {
-  fwrite(p, size, 1, stdout);
+  // fwrite(p, size, 1, stdout);
+  // Instead of sending data to STDOUT, send data to the NodeJS server using UDP socket.
+  FrameToServer_sendResponseT(p, size);
+  
   Record_addFrame(p, size);
 
   // Create MJPEG codec
@@ -348,6 +352,9 @@ static void closeDevice(void)
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 void Camera_beginCamera()
 {
+  // Open UDP Connection
+  FrameToServer_openConnectionT();
+
   devName = "/dev/video0";
   openDevice();
   initDevice();
@@ -389,4 +396,7 @@ void Camera_beginCamera()
 
   uninitDevice();
   closeDevice();
+
+  // Close UDP Connection
+  FrameToServer_closeConnectionT();
 }
