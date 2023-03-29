@@ -13,7 +13,7 @@ static struct sockaddr_in sinT;
 static struct sockaddr_in sinRemoteT;
 static int socketDescriptorT;
 
-void FrameToServer_openConnectionT()
+void UDP_openConnection()
 {
     memset(&sinT, 0, sizeof(sinT));
     sinT.sin_family = AF_INET;
@@ -23,9 +23,9 @@ void FrameToServer_openConnectionT()
     bind(socketDescriptorT, (struct sockaddr *)&sinT, sizeof(sinT));
     sinRemoteT.sin_family = AF_INET;
     sinRemoteT.sin_port = htons(RPORT_T);
-    sinRemoteT.sin_addr.s_addr = inet_addr("192.168.7.2");
+    sinRemoteT.sin_addr.s_addr = inet_addr("192.168.7.1");
 }
-int FrameToServer_sendResponseT(const void *str, int size)
+int UDP_sendFrame(const void *str, int size)
 {
     int packetSent = 0;
     sendto(socketDescriptorT,
@@ -36,7 +36,7 @@ int FrameToServer_sendResponseT(const void *str, int size)
            sizeof(sinRemoteT));
     return packetSent;
 }
-void FrameToServer_closeConnectionT()
+void UDP_closeConnection()
 {
     close(socketDescriptorT);
 }

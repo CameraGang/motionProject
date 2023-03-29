@@ -6,5 +6,6 @@
 #define THRESHOLD 30
 
 void Camera_beginCamera();
+void Camera_stop();
 
 #endif

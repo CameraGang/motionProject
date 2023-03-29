@@ -1,5 +1,6 @@
 #include <fcntl.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <unistd.h>
 #include <assert.h>
@@ -16,10 +17,11 @@
 
 #include "camera.h"
 #include "record.h"
-#include "frameToServer.h"
+#include "udp.h"
 
 static char *devName;
 static int fd = -1; // camera file
+static int isRunning = true;
 
 int frameNum = 0; // stores the number of frameNum the camera has seen so far
 
@@ -185,7 +187,7 @@ static void processImage(unsigned char *p, int size)
 {
   // fwrite(p, size, 1, stdout);
   // Instead of sending data to STDOUT, send data to the NodeJS server using UDP socket.
-  FrameToServer_sendResponseT(p, size);
+  UDP_sendFrame(p, size);
   
   Record_addFrame(p, size);
 
@@ -349,18 +351,22 @@ static void closeDevice(void)
   fd = -1;
 }
 
+void Camera_stop() {
+  isRunning = false;
+}
+
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 void Camera_beginCamera()
 {
   // Open UDP Connection
-  FrameToServer_openConnectionT();
+  UDP_openConnection();
 
   devName = "/dev/video0";
   openDevice();
   initDevice();
   startCapturing();
 
-  while (1)
+  while (isRunning)
   {
     for (;;)
     {
@@ -398,5 +404,5 @@ void Camera_beginCamera()
   closeDevice();
 
   // Close UDP Connection
-  FrameToServer_closeConnectionT();
+  UDP_closeConnection();
 }

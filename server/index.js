@@ -15,7 +15,7 @@ io.on('connection', (socket) => {
         "-re",
         "-y",
         "-i",
-        "udp://192.168.7.2:1234",
+        "udp://192.168.7.1:1234",
         "-preset",
         "ultrafast",
         "-f",
