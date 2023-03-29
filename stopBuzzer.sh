@@ -1,0 +1,1 @@
+echo 0 > /dev/bone/pwm/0/a/enable
