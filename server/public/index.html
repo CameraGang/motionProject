@@ -3,16 +3,22 @@
     <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Camera Gang</title>
-	<link rel="stylesheet" href="style.css">
 <head>
     <title>Video Streaming</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 
 <body>
     <h1>Welcome to Camera Gang's Security System</h1>
+    <div class="container">
+        <div id="date" class="component box1"></div>
+        <div id="clock" class="component box2"></div>
+    </div>
     <canvas id="videostream" width="1280" height="720"></canvas>
+    <div class="component"></div>
+    
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
