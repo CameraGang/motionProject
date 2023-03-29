@@ -1,3 +1,5 @@
+// Code Referenced from https://opencoursehub.cs.sfu.ca/bfraser/grav-cms/cmpt433/links/files/2022-student-howtos/StreamingWebcamFromBeagleBoneToNodeJSServer.pdf
+
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -40,5 +42,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen({ port }, () => {
-    console.log(`🚀 Server ready at http://0.0.0.0:${port}`);
+    console.log(`Server ready at http://192.168.7.1:${port}`);
 });

@@ -40,3 +40,27 @@ h1 {
 .box2 {
   width: 50%;
 }
+
+.center {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+}
+
+button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 30px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #3e8e41;
+}

@@ -16,8 +16,19 @@
         <div id="date" class="component box1"></div>
         <div id="clock" class="component box2"></div>
     </div>
-    <canvas id="videostream" width="1280" height="720"></canvas>
-    <div class="component"></div>
+    
+    <div class="container">
+        <canvas id="videostream" class="box1" width="720" height="720"></canvas>
+        <canvas id="capturedImage" class="box2" width="720" height="720"></canvas>
+    </div>
+    <div class="container">
+        <div class="box1 center">Video</div>
+        <div class="box1 center">Captured Image</div>
+    </div>
+    <div class="container">
+        <button id="capture" class="box1">Capture Image</button>
+        <button id="save" class="box2">Save Image</button>
+    </div>
     
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

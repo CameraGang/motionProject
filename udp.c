@@ -1,3 +1,4 @@
+// Code referenced from https://opencoursehub.cs.sfu.ca/bfraser/grav-cms/cmpt433/links/files/2022-student-howtos/StreamingWebcamFromBeagleBoneToNodeJSServer.pdf
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdbool.h>
@@ -7,7 +8,7 @@
 #include <string.h>
 
 #define PORT_T 3000
-#define RPORT_T 1234 // Port for NodeJS
+#define RPORT_T 1234
 
 static struct sockaddr_in sinT;
 static struct sockaddr_in sinRemoteT;
