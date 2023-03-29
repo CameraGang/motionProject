@@ -17,6 +17,8 @@
 
 #include "camera.h"
 #include "record.h"
+#include "buzzer.h"
+#include "led.h"
 #include "udp.h"
 
 static char *devName;
@@ -181,6 +183,7 @@ uint8_t *prevFrameData = NULL;
 int motion = 0;
 int prevMotion = -1;
 int firstFrame = 1;
+int stoppingMotionCount = 0;
 
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 static void processImage(unsigned char *p, int size)
@@ -259,10 +262,17 @@ static void processImage(unsigned char *p, int size)
     if (differentPixels >= frameDataSize * 0.1)
     {
       motion++;
+      stoppingMotionCount = 0;
     }
     else
     {
       motion--;
+      stoppingMotionCount++;
+
+      if (stoppingMotionCount == STOP_RECORDING_THRESHOLD) {
+        motion = 1; // next frame it will stop
+      }
+
       if (motion < 0)
       {
         motion = 0;
@@ -274,11 +284,15 @@ static void processImage(unsigned char *p, int size)
       if (motion == 1 && prevMotion < 1)
       { // motion has begun
         Record_markStart();
+        Buzzer_enableBuzz();
+        led_start();
       }
 
       if (prevMotion > 0 && motion == 0)
-      {
+      { // motion has ended
         Record_markEnd();
+        Buzzer_disableBuzz();
+        led_stop();
       }
     }
 
