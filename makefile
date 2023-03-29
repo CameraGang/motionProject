@@ -11,7 +11,7 @@ all:
 	$(CC_C) $(CFLAGS) $(FILES)  -o $(OUTDIR)/$(OUTFILE) -lavformat -lavcodec -lavutil -lswscale
 
 run:
-	$(OUTDIR)/$(OUTFILE) | ffmpeg -vcodec mjpeg -i pipe:0 -f mjpeg udp://192.168.7.1:1234
+	$(OUTDIR)/$(OUTFILE) | ffmpeg -vcodec mjpeg -i pipe:0 -f mjpeg udp://192.168.7.2:1234
 
 delete:
 	rm rec_*

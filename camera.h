@@ -1,7 +1,7 @@
 #ifndef CAMERA
 #define CAMERA
 
-#define WIDTH 1280
+#define WIDTH 720
 #define HEIGHT 720
 #define THRESHOLD 30
 

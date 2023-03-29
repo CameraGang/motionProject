@@ -23,7 +23,7 @@ void FrameToServer_openConnectionT()
     bind(socketDescriptorT, (struct sockaddr *)&sinT, sizeof(sinT));
     sinRemoteT.sin_family = AF_INET;
     sinRemoteT.sin_port = htons(RPORT_T);
-    sinRemoteT.sin_addr.s_addr = inet_addr("192.168.7.1");
+    sinRemoteT.sin_addr.s_addr = inet_addr("192.168.7.2");
 }
 int FrameToServer_sendResponseT(const void *str, int size)
 {
