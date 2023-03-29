@@ -278,16 +278,14 @@ static void processImage(unsigned char *p, int size)
       if (motion == 1 && prevMotion < 1)
       { // motion has begun
         Record_markStart();
-        // Buzzer_init();
-        // led_init();
+        Buzzer_enableBuzz();
         led_start();
       }
 
       if (prevMotion > 0 && motion == 0)
       { // motion has ended
         Record_markEnd();
-        // led_cleanup();
-        // Buzzer_cleanup();
+        Buzzer_disableBuzz();
         led_stop();
       }
     }

@@ -2,20 +2,10 @@
 #include "helper.h"
 #include "sharedFunc.h"
 
-// void sleepForMs(long long delayInMs)
-// {
-// 	const long long NS_PER_MS = 1000 * 1000;
-// 	const long long NS_PER_SECOND = 1000000000;
-// 	long long delayNs = delayInMs * NS_PER_MS;
-// 	int seconds = delayNs / NS_PER_SECOND;
-// 	int nanoseconds = delayNs % NS_PER_SECOND;
-// 	struct timespec reqDelay = {seconds, nanoseconds};
-// 	nanosleep(&reqDelay, (struct timespec *) NULL);
-// }
-
 pthread_t buzzerThreadId;
+static int enabled = 0;
 
-enum direction joystickDir(void){
+static enum direction joystickDir(void){
 	
 
 	int U = readFromFileToScreenBuzz(DA_JOYSTICK_FILE_NAME_HERE_U);	
@@ -47,29 +37,8 @@ enum direction joystickDir(void){
 }
 
 
-// void runCommandSing(char* command){
-//     // Execute the shell command (output into pipe)
-//     FILE *pipe = popen(command, "r");
-//     // Ignore output of the command; but consume it
-//     // so we don't get an error when closing the pipe.
-//     char buffer[1024];
-//     while (!feof(pipe) && !ferror(pipe)) {
-//         if (fgets(buffer, sizeof(buffer), pipe) == NULL)
-//             break;
-//         // printf("--> %s", buffer); // Uncomment for debugging
-//     }
-//     // Get the exit code from the pipe; non-zero is an error:
-//     int exitCode = WEXITSTATUS(pclose(pipe));
-//     if (exitCode != 0) {
-//         perror("Unable to execute command:");
-//         printf(" command: %s\n", command);
-//         printf(" exit code: %d\n", exitCode);
-//     }
-// }
-
-
-void initCommandsBuzzer(void){
-    runCommandSing("sudo config-pin p9_22 pwm");
+static void initCommandsBuzzer(void){
+    runCommandSing("config-pin p9_22 pwm");
 
 
     runCommandSing("config-pin p8.14 gpio");
@@ -138,7 +107,7 @@ void initCommandsBuzzer(void){
 
 
 
-void startBuzzerA(int mode){
+static void startBuzzerA(int mode){
      
 
     FILE *pFileA = fopen("/dev/bone/pwm/0/a/duty_cycle", "w");
@@ -214,7 +183,7 @@ void startBuzzerA(int mode){
 
 }
 
-void startBuzzerB(int mode){
+static void startBuzzerB(int mode){
      
 
     FILE *pFileA = fopen("/dev/bone/pwm/0/a/duty_cycle", "w");
@@ -308,27 +277,18 @@ void startBuzzerB(int mode){
 }
 
 
-void stopBuzzer(void){
+static void stopBuzzer(void){
 
     FILE *pFileC = fopen("/dev/bone/pwm/0/a/enable", "w");
     if(pFileC == NULL){
         printf("ERROR: Unable to open buzzer enable");
     }
 
-    //turn on buzzer
+    //turn off buzzer
     fprintf(pFileC, "%d", 0);
     fclose(pFileC);
 }
 
-int modeSetter(int currMode){
-    if(currMode != 3){
-        currMode++;
-    }
-    else{
-        currMode = 0;
-    }
-    return currMode;
-}
 
 int readFromFileToScreenBuzz(char *fileName)
 {
@@ -434,10 +394,13 @@ void *buzzerThread(void *arg){
             else{
                 modeA = 0;
             }
-            sleepForMs(sleepOff);
-            startBuzzerA(modeA);
-            sleepForMs(sleepOn);
-            stopBuzzer();
+
+            if (enabled == 1) {
+                sleepForMs(sleepOff);
+                startBuzzerA(modeA);
+                sleepForMs(sleepOn);
+                stopBuzzer();
+            }
         }
 
         while(songB){
@@ -491,10 +454,13 @@ void *buzzerThread(void *arg){
             else{
                 modeB = 0;
             }
-            sleepForMs(sleepOff);
-            startBuzzerB(modeB);
-            sleepForMs(sleepOn);
-            stopBuzzer();
+
+            if (enabled == 1) {
+                sleepForMs(sleepOff);
+                startBuzzerB(modeB);
+                sleepForMs(sleepOn);
+                stopBuzzer();
+            }
             
         }
         while(songMute){
@@ -514,4 +480,12 @@ void *buzzerThread(void *arg){
     }
     stopBuzzer();
     return 0;
+}
+
+void Buzzer_enableBuzz() {
+    enabled = 1;
+}
+
+void Buzzer_disableBuzz() {
+    enabled = 0;
 }
