@@ -7,7 +7,7 @@
 #include <pthread.h>
 
 #include <unistd.h>
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 512
 #define PRE_FRAMES 10          // Number of frames that should be added to video before the motion has started
 #define OUTPUT_FILE "./rec_%d" // extension will be added via code
 

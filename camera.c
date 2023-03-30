@@ -267,7 +267,7 @@ static void processImage(unsigned char *p, int size)
     }
 
     // if more than 10% of pixels are different then motion!
-    if (differentPixels >= frameDataSize * 0.1)
+    if (differentPixels >= frameDataSize * 0.05)
     {
       motion++;
       stoppingMotionCount = 0;
