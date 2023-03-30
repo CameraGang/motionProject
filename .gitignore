@@ -1,1 +1,35 @@
 rec_*
+
+# Ignore node_modules directory
+node_modules/
+
+# Ignore logs and generated files
+logs/
+*.log
+*.pid
+*.seed
+
+# Ignore environment-specific files
+.env
+.env.local
+.env.*.local
+.env.*.test
+.env.test
+.env.production
+.env.development
+
+# Ignore dependency lock files
+yarn.lock
+package-lock.json
+npm-shrinkwrap.json
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore test coverage output
+coverage/
+
+# Ignore build output
+build/
+dist/
