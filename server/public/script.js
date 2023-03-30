@@ -3,6 +3,17 @@ socket.on("connect", (socket) => {
     console.log("Connected");
 });
 
+socket.on("response", (data) => {
+    data = JSON.parse(data);
+    console.log(data);
+    document.getElementById('motionStatus').innerHTML = data["motion"] == 0 ? "no motion 😌" : "MOTION DETECTED! 🚨";
+    document.getElementById('frameNum').innerHTML = "Frame: " + data["frameNum"];
+});
+
+setInterval(() => {
+    performAction("ping");
+},250);
+
 $(document).ready(function () {
     var canvasVideo = document.getElementById('videostream');
     var canvasImage = document.getElementById('capturedImage');
@@ -51,6 +62,10 @@ $(document).ready(function () {
         link.href = dataUrl;
         link.click();
     });
+    
+    $('#togglealarm').click(function () {
+        performAction('togglealarm');
+    });
 });
 
 function updateTime() {
@@ -65,4 +80,8 @@ function showDate() {
     const [year, month, day] = isoString.slice(0, 10).split('-');
     const formattedDate = `${year}:${month}:${day}`; // e.g. '2022:04:06'
     $('#date').html("Date : " + formattedDate);
+}
+
+function performAction(code) {
+    socket.emit("action", code);
 }

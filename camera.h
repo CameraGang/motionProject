@@ -9,4 +9,7 @@
 void Camera_beginCamera();
 void Camera_stop();
 
+int Camera_getFrameNum();
+int Camera_getMotionState();
+
 #endif

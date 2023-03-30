@@ -31,4 +31,6 @@ void *buzzerThread(void *arg);
 	
 void Buzzer_enableBuzz();
 void Buzzer_disableBuzz(); 
+void Buzzer_toggleAlarm();
+
 #endif	
