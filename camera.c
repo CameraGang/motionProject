@@ -185,6 +185,14 @@ int prevMotion = -1;
 int firstFrame = 1;
 int stoppingMotionCount = 0;
 
+int Camera_getMotionState() {
+  return motion;
+}
+
+int Camera_getFrameNum() {
+  return frameNum;
+}
+
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 static void processImage(unsigned char *p, int size)
 {
@@ -259,7 +267,7 @@ static void processImage(unsigned char *p, int size)
     }
 
     // if more than 10% of pixels are different then motion!
-    if (differentPixels >= frameDataSize * 0.1)
+    if (differentPixels >= frameDataSize * 0.05)
     {
       motion++;
       stoppingMotionCount = 0;

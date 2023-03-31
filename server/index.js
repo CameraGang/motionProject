@@ -8,8 +8,13 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const startRouter = require('./routers/page.js');
 const { SERVER_PORT: port = 3000 } = process.env;
+const udpManager = require("./udpManager.js");
 
 const child = require('child_process');
+
+const udp = require("dgram");
+var client = udp.createSocket("udp4");
+
 app.use('/', startRouter);
 io.on('connection', (socket) => {
     console.log('a user connected');
@@ -39,6 +44,12 @@ io.on('connection', (socket) => {
         var frame = Buffer.from(data).toString('base64'); //convert raw data to string
         io.sockets.emit('canvas', frame); //send data to client
     });
+
+    socket.on("action", (code) => {
+        udpManager.sendMsg(client, code, socket);
+    })
+
+    udpManager.listenForResponse(client, socket);
 });
 
 server.listen({ port }, () => {

@@ -5,6 +5,8 @@
 pthread_t buzzerThreadId;
 static int enabled = 0;
 
+int toggle = 0;
+
 static enum direction joystickDir(void){
 	
 
@@ -306,6 +308,10 @@ int readFromFileToScreenBuzz(char *fileName)
 	return(atoi(buff));
 }
 
+void Buzzer_toggleAlarm() {
+    toggle = 1;
+}
+
 void Buzzer_init()
 {
     initCommandsBuzzer();
@@ -349,7 +355,7 @@ void *buzzerThread(void *arg){
 
             long long currTime = getTimeInMs();
             dirIn = joystickDir();
-            if(dirIn == RIGHT){
+            if(dirIn == RIGHT || toggle == 1){
                 if(currTime - prevTime >= 500){
                     songA = 0;
                     songB = 1;
@@ -357,6 +363,7 @@ void *buzzerThread(void *arg){
                     stopBuzzer(); 
                     sleepForMs(1000); 
                     prevTime = currTime;
+                    toggle = 0;
                 }
                 
             }
@@ -406,7 +413,7 @@ void *buzzerThread(void *arg){
         while(songB){
             long long currTime = getTimeInMs();
             dirIn = joystickDir();
-            if(dirIn == RIGHT){
+            if(dirIn == RIGHT || toggle){
                 if(currTime - prevTime >= 500)
                 songA = 1;
                 songB = 0; 
@@ -414,6 +421,7 @@ void *buzzerThread(void *arg){
                 stopBuzzer();
                 sleepForMs(1000);
                 prevTime = currTime; 
+                toggle = 0;
             }
                
             else if(dirIn == IN){
