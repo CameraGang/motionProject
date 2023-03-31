@@ -32,8 +32,6 @@ static void *saveToFileThread(void *args)
 {
   motionMarkers_t *markers = (motionMarkers_t *)args; // cast to correct type
 
-  // Mount USB drive
-  system("sudo mount /dev/sda1 /mnt/usb");
 
   // Set filename
   char filename[100];
@@ -67,18 +65,17 @@ static void *saveToFileThread(void *args)
   runCommand(conversionCommand, output);
 
   // // Copy .avi file to USB drive
-  // char usbPath[200];
-  // snprintf(usbPath, 200, "/mnt/usb/%s.avi", filename);
-  // char copyCommand[500];
-  // snprintf(copyCommand, 500, "cp %s.avi %s", filename, usbPath);
-  // runCommand(copyCommand, output);
+  char usbPath[200];
+  snprintf(usbPath, 200, "/home/debian/usb-mount/");
+  char copyCommand[500];
+  snprintf(copyCommand, 500, "cp %s.avi %s", filename, usbPath);
+  runCommand(copyCommand, output);
 
   // delete mjpeg file
   snprintf(conversionCommand, 500, "rm %s.mjpeg", filename);
   runCommand(conversionCommand, output);
 
   // Unmount USB drive
-  system("sudo umount /mnt/usb");
 
   free(markers);
   pthread_exit(NULL);

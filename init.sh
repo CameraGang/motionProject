@@ -1,0 +1,1 @@
+sudo mount /dev/sda1 /home/debian/usb-mount -o umask=000
