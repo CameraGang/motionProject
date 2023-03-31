@@ -23,9 +23,9 @@ To use:
 
 3. Identify the USB drive from the output of the `lsblk` command. It should have a name like /dev/sda1 or /dev/sdb1.
 
-4. Create a directory to use as the mount point for the USB drive. For example, you can create a directory named /mnt/usb by running the command `sudo mkdir /mnt/usb`.
+4. Create a directory to use as the mount point for the USB drive. For example, you can create a directory named /mnt/usb-mount by running the command `mkdir /mnt/usb-mount`.
 
-5. Mount the USB drive to the directory you just created by running the command `sudo mount /dev/sda1 /home/debian/usb-mount -o` (replace /dev/sda1 with the name of the USB drive you identified in step 3).
+5. Mount the USB drive to the directory you just created by running the command `sudo mount /dev/sda1 /home/debian/usb-mount -o umask=000` (replace /dev/sda1 with the name of the USB drive you identified in step 3).
 
 6. Verify that the USB drive is mounted correctly by running the command `df -h` . You should see a line in the output showing the mount point directory /mnt/usb and the device name of the USB drive.
 
