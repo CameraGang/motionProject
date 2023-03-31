@@ -1,5 +1,6 @@
 #include <fcntl.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <unistd.h>
 #include <assert.h>
@@ -16,9 +17,13 @@
 
 #include "camera.h"
 #include "record.h"
+#include "buzzer.h"
+#include "led.h"
+#include "udp.h"
 
 static char *devName;
 static int fd = -1; // camera file
+static int isRunning = true;
 
 int frameNum = 0; // stores the number of frameNum the camera has seen so far
 
@@ -178,11 +183,15 @@ uint8_t *prevFrameData = NULL;
 int motion = 0;
 int prevMotion = -1;
 int firstFrame = 1;
+int stoppingMotionCount = 0;
 
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 static void processImage(unsigned char *p, int size)
 {
-  fwrite(p, size, 1, stdout);
+  // fwrite(p, size, 1, stdout);
+  // Instead of sending data to STDOUT, send data to the NodeJS server using UDP socket.
+  UDP_sendFrame(p, size);
+  
   Record_addFrame(p, size);
 
   // Create MJPEG codec
@@ -253,10 +262,17 @@ static void processImage(unsigned char *p, int size)
     if (differentPixels >= frameDataSize * 0.1)
     {
       motion++;
+      stoppingMotionCount = 0;
     }
     else
     {
       motion--;
+      stoppingMotionCount++;
+
+      if (stoppingMotionCount == STOP_RECORDING_THRESHOLD) {
+        motion = 1; // next frame it will stop
+      }
+
       if (motion < 0)
       {
         motion = 0;
@@ -268,11 +284,15 @@ static void processImage(unsigned char *p, int size)
       if (motion == 1 && prevMotion < 1)
       { // motion has begun
         Record_markStart();
+        Buzzer_enableBuzz();
+        led_start();
       }
 
       if (prevMotion > 0 && motion == 0)
-      {
+      { // motion has ended
         Record_markEnd();
+        Buzzer_disableBuzz();
+        led_stop();
       }
     }
 
@@ -345,15 +365,22 @@ static void closeDevice(void)
   fd = -1;
 }
 
+void Camera_stop() {
+  isRunning = false;
+}
+
 // Method extracted from https://www.kernel.org/doc/html/v4.11/media/uapi/v4l/capture.c.html and then modified to meet our needs
 void Camera_beginCamera()
 {
+  // Open UDP Connection
+  UDP_openConnection();
+
   devName = "/dev/video0";
   openDevice();
   initDevice();
   startCapturing();
 
-  while (1)
+  while (isRunning)
   {
     for (;;)
     {
@@ -389,4 +416,7 @@ void Camera_beginCamera()
 
   uninitDevice();
   closeDevice();
+
+  // Close UDP Connection
+  UDP_closeConnection();
 }
