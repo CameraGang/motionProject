@@ -32,7 +32,6 @@ static void *saveToFileThread(void *args)
 {
   motionMarkers_t *markers = (motionMarkers_t *)args; // cast to correct type
 
-
   // Set filename
   char filename[100];
   snprintf(filename, 100, OUTPUT_FILE, (int)time(NULL));
@@ -58,13 +57,12 @@ static void *saveToFileThread(void *args)
   fclose(fp);
 
   // Convert mjpeg to .avi
-
   char conversionCommand[500];
   snprintf(conversionCommand, 500, "ffmpeg -r 5 -i %s.mjpeg -c copy %s.avi", filename, filename);
   char output[20];
   runCommand(conversionCommand, output);
 
-  // // Copy .avi file to USB drive
+  // Copy .avi file to USB drive
   char usbPath[200];
   snprintf(usbPath, 200, "/home/debian/usb-mount/");
   char copyCommand[500];
@@ -74,8 +72,6 @@ static void *saveToFileThread(void *args)
   // delete mjpeg file
   snprintf(conversionCommand, 500, "rm %s.mjpeg", filename);
   runCommand(conversionCommand, output);
-
-  // Unmount USB drive
 
   free(markers);
   pthread_exit(NULL);
