@@ -62,6 +62,13 @@ static void *saveToFileThread(void *args)
   char output[20];
   runCommand(conversionCommand, output);
 
+  // Copy .avi file to USB drive
+  char usbPath[200];
+  snprintf(usbPath, 200, "/home/debian/usb-mount/");
+  char copyCommand[500];
+  snprintf(copyCommand, 500, "cp %s.avi %s", filename, usbPath);
+  runCommand(copyCommand, output);
+
   // delete mjpeg file
   snprintf(conversionCommand, 500, "rm %s.mjpeg", filename);
   runCommand(conversionCommand, output);
