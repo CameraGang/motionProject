@@ -183,13 +183,15 @@ uint8_t *prevFrameData = NULL;
 int motion = 0;
 int prevMotion = -1;
 int firstFrame = 1;
-int stoppingMotionCount = 0;
+int stoppingMotionCount = 0; // counts number of frames since last motion frames
 
-int Camera_getMotionState() {
+int Camera_getMotionState()
+{
   return motion;
 }
 
-int Camera_getFrameNum() {
+int Camera_getFrameNum()
+{
   return frameNum;
 }
 
@@ -199,19 +201,20 @@ static void processImage(unsigned char *p, int size)
   // fwrite(p, size, 1, stdout);
   // Instead of sending data to STDOUT, send data to the NodeJS server using UDP socket.
   UDP_sendFrame(p, size);
-  
+
   Record_addFrame(p, size);
 
   // Create MJPEG codec
   AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
 
-  // Create the context... whatever that means
+  // Create the context
   AVCodecContext *codecContext = avcodec_alloc_context3(codec);
 
   // Open codec
   if (avcodec_open2(codecContext, codec, NULL) < 0)
   {
     printf("avcodec_open2 error\n");
+    exit(1);
   }
 
   // Take the mjpeg buffer data and put it in packet
@@ -226,6 +229,7 @@ static void processImage(unsigned char *p, int size)
   {
     // Handle error
     printf("send packet error\n");
+    exit(1);
   }
 
   // Alloc frame
@@ -234,8 +238,8 @@ static void processImage(unsigned char *p, int size)
   // Receive the frame from avocdec and now we have the decoded data!
   if (avcodec_receive_frame(codecContext, frame) < 0)
   {
-    // error
     printf("receive frame error\n");
+    exit(1);
   }
 
   uint8_t *frameData = frame->data[0];                    // grab data from one channel, because we don't care for color. This channel should be red channel
@@ -277,7 +281,8 @@ static void processImage(unsigned char *p, int size)
       motion--;
       stoppingMotionCount++;
 
-      if (stoppingMotionCount == STOP_RECORDING_THRESHOLD) {
+      if (stoppingMotionCount == STOP_RECORDING_THRESHOLD)
+      {
         motion = 1; // next frame it will stop
       }
 
@@ -373,7 +378,8 @@ static void closeDevice(void)
   fd = -1;
 }
 
-void Camera_stop() {
+void Camera_stop()
+{
   isRunning = false;
 }
 

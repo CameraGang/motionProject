@@ -93,8 +93,6 @@ void Record_markEnd()
   markers->start = motionStartIndex;
   markers->end = motionEndIndex;
 
-  // TODO: Keep track of these tid to end gracefully at the end.
-  // TODO: Use an array maybe?
   pthread_t tid;
   pthread_create(&tid, NULL, *saveToFileThread, (void *)markers);
 }
